@@ -38,18 +38,80 @@ The system is built using **Flask**, **MySQL**, and **ExifTool**, and deployed u
     - Runs as stateful service with persistent volume claim (PVC).
 
 ### Communication
-- App **<->** Cleaner vis REST API.
+- App **<->** Cleaner via REST API.
 - App **<->** Auth via internal Flask/DB calls.
 - Auth **<->** DB via SQL queries.
 
 ### Diagram
 ```mermaid
 flowchart TD
-    Browser[Browser] --> App[App/UI Service]
-    App --> Auth[Auth Service]
-    Auth --> DB[DB Service<br/>MySQL]
-    App --> Cleaner[Cleaner Service<br/>runs exiftool]
+    Browser(Browser) e1@==>|1. Login request| Auth(Auth Service)
+    Auth e2@==>|2. Verify user via SQL queries| DB[(DB Service<br/> - MySQL -)]
+    DB e3@==>|3. SQL responses - user record| Auth
+    Auth e4@==>|4. Session cookie / JWT| Browser
+    Browser e5@==>|5. Authenticated requests - with session| App(App/UI Service)
+    App e6@==>|6. REST API calls| Cleaner(Cleaner Service<br/> - runs exiftool -)
+    Cleaner e7@==>|7. REST API responses| App
+    
+    classDef animate stroke-dasharray: 9,5,stroke-dashoffset: 900,animation: dash 25s linear infinite;
+    class e1 animate; class e2 animate; class e3 animate; class e4 animate; class e5 animate; class e6 animate; class e7 animate
+
  ```
+## 📂 Repository Structure
+
+```
+image-MetaCleaner/
+|
+├── app.py                         # Flask entrypoint
+├── db.py                          # Database connection helper
+├── models.py                      # SQLAlchemy models
+├── requirements.txt               # Python dependencies
+├── Dockerfile                     # App image build context
+├── Makefile                       # Kubernetes automation targets
+├── docker-compose.template.yml    # Local compose template (placeholders)
+├── auth/                          # Authentication blueprint
+|   ├── __init__.py
+|   └── routes.py                  # Auth routes
+|
+├── main/                          # Main application blueprint
+|   ├── __init__.py
+|   └── routes.py                  # UI routes
+|
+├── templates/                     # Jinja2 templates
+|   ├── base.html
+|   ├── history.html
+|   ├── index.html
+|   ├── login.html
+|   └── signup.html
+|
+├── static/                        # Static assets
+|   ├── favicon.ico
+|   ├── logo.png
+|   └── styles.css
+|
+├── cleaner-service/               # Cleaner microservice
+|   ├── cleaner.py
+|   ├── dockerfile
+|   └── requirements.txt
+|
+├── database/                      # Custom MySQL image files
+|   ├── Dockerfile
+|   ├── entrypoint.sh
+|   └── scripts/
+|       └── create_table.sql
+|
+└── k8s/                           # Kubernetes manifests
+    ├── app.yaml
+    ├── cleaner.yaml
+    ├── db-init.yaml
+    ├── db-pvc.yaml
+    ├── db.yaml
+    ├── ingress.yaml
+    ├── namespace.yaml
+    └── secrets.template.yaml      # Placeholder secret template
+```
+
+
 
 ## 🛠️ Setup
 
