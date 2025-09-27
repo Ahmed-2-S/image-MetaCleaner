@@ -47,9 +47,8 @@ The system is built using **Flask**, **MySQL**, and **ExifTool**, and deployed u
 flowchart TD
     Browser[Browser] --> App[App/UI Service]
     App --> Auth[Auth Service]
-    Auth --> DB[DB Service (MySQL)]
+    Auth --> DB[DB Service<br/>MySQL]
     App --> Cleaner[Cleaner Service<br/>(runs exiftool)]
-
  ```
 
 ## 🛠️ Setup
