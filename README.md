@@ -48,7 +48,7 @@ flowchart TD
     Browser[Browser] --> App[App/UI Service]
     App --> Auth[Auth Service]
     Auth --> DB[DB Service<br/>MySQL]
-    App --> Cleaner[Cleaner Service<br/>(runs exiftool)]
+    App --> Cleaner[Cleaner Service<br/>runs exiftool]
  ```
 
 ## 🛠️ Setup
