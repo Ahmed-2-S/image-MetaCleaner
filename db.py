@@ -13,8 +13,8 @@ def get_db_connection():
     connection = mysql.connector.connect(
         host=os.getenv("DB_HOST", "metacleaner-db"),
         port=int(os.getenv("DB_PORT", 3306)),
-        user=read_secret("DB_USER") or os.getenv("DB_USER"),
-        password=read_secret("DB_PASSWORD") or os.getenv("DB_PASSWORD"),
+        user=read_secret("DB_USER") or os.getenv("DB_USER", "REPLACE_USER"),
+        password=read_secret("DB_PASSWORD") or os.getenv("DB_PASSWORD", "REPLACE_PASSWORD"),
         database=os.getenv("DB_NAME", "dbMetaCleaner")
     )
     return connection
