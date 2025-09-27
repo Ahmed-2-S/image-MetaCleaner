@@ -1,0 +1,18 @@
+# k8s/ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: metacleaner-ingress
+  namespace: metacleaner
+spec:
+  rules:
+  - host: metacleaner.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: app
+            port:
+              number: 5000

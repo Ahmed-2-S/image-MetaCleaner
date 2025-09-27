@@ -1,0 +1,116 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: metacleaner-app
+  namespace: metacleaner
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: metacleaner-app
+  template:
+    metadata:
+      labels:
+        app: metacleaner-app
+    spec:
+      initContainers:
+      - name: wait-for-db                  # Ensure DB is ready before app starts
+        image: mysql:8.0                   # Reuse MySQL client tools for readiness check
+        command:
+        - /bin/sh
+        - -c
+        - >-
+          until mysqladmin ping -h "$DB_HOST" -u "$DB_USER" -p"$DB_PASSWORD" --silent; do
+            echo "Waiting for database...";  # Keep retrying until ping succeeds
+            sleep 2;
+          done
+        env:
+        - name: DB_HOST
+          valueFrom:
+            secretKeyRef:
+              name: metacleaner-secrets
+              key: DB_HOST
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: metacleaner-secrets
+              key: DB_USER
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: metacleaner-secrets
+              key: DB_PASSWORD
+      containers:
+      - name: metacleaner-app
+        image: ahmeds25/metacleaner-app:latest
+        ports:
+        - containerPort: 5000                  # The port the app listens on
+        env:                                   # Environment variables from secrets
+        - name: DB_HOST
+          valueFrom:
+            secretKeyRef:
+              name: metacleaner-secrets
+              key: DB_HOST
+        - name: DB_PORT
+          valueFrom:
+            secretKeyRef:
+              name: metacleaner-secrets
+              key: DB_PORT
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: metacleaner-secrets
+              key: DB_USER
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: metacleaner-secrets
+              key: DB_PASSWORD
+        - name: DB_NAME
+          valueFrom:
+            secretKeyRef:
+              name: metacleaner-secrets
+              key: DB_NAME
+        - name: CLEANER_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: metacleaner-secrets
+              key: CLEANER_API_KEY
+        - name: SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: metacleaner-secrets
+              key: SECRET_KEY
+        - name: CLEANER_URL
+          value: http://metacleaner-cleaner:5001   # Cleaner service inside cluster
+        - name: FLASK_ENV
+          value: production
+        volumeMounts:                           # Mount the secret as files, optional
+        - name: secret-volume
+          mountPath: "/etc/secrets"
+          readOnly: true
+        readinessProbe:                    # Hold back traffic until Flask responds
+          httpGet:
+            path: /
+            port: 5000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          failureThreshold: 6
+      volumes:                                  # Volumes are defined at pod spec level
+      - name: secret-volume
+        secret:
+          secretName: metacleaner-secrets
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: metacleaner-app
+  namespace: metacleaner
+spec:
+  type: NodePort
+  ports:
+  - port: 5000
+    targetPort: 5000
+    nodePort: 30000   # External port on localhost/minikube
+  selector:
+    app: metacleaner-app

@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}History - MetaCleaner{% endblock %}
+
+{% block content %}
+<div class="card p-8 rounded-lg">
+    <h2 class="text-2xl font-bold mb-6 text-center">📜 Cleaning History</h2>
+
+    {% if files %}
+    <div class="overflow-x-auto">
+        <table class="min-w-full bg-gray-800 rounded-lg overflow-hidden">
+            <thead class="bg-gray-700 text-gray-300">
+                <tr>
+                    <th class="px-4 py-2 text-center">Filename</th>
+                    <th class="px-4 py-2 text-center">Original Size</th>
+                    <th class="px-4 py-2 text-center">Cleaned Size</th>
+                    <th class="px-4 py-2 text-center">Difference</th>
+                    <th class="px-4 py-2 text-center">Date</th>
+                </tr>
+            </thead>
+            <tbody class="text-gray-200">
+                {% for file in files %}
+                <tr class="border-b border-gray-700">
+                    <td class="px-4 py-2 text-center">{{ file.filename }}</td>
+                    <td class="px-4 py-2 text-center text-red-400">{{ file.original_size | filesizeformat }}</td>
+                    <td class="px-4 py-2 text-center text-green-400">{{ file.cleaned_size | filesizeformat }}</td>
+                    <td class="px-4 py-2 text-center">
+                        {% if file.original_size and file.cleaned_size %}
+                            {% set saved = file.original_size - file.cleaned_size %}
+                            {% if saved > 0 %}
+                                <span class="text-green-400">{{ saved | filesizeformat }}</span>
+                            {% elif saved == 0 %}
+                                <span class="text-gray-400">No change</span>
+                            {% else %}
+                                <span class="text-gray-400">{{ 0 | filesizeformat }}</span>
+                            {% endif %}
+                        {% else %}
+                            <span class="text-gray-400">Pending</span>
+                        {% endif %}
+                    </td>
+                    <td class="px-4 py-2 text-center text-gray-300">{{ file.cleaned_at }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+        <p class="text-gray-400 text-center">No files cleaned yet.</p>
+    {% endif %}
+</div>
+{% endblock %}

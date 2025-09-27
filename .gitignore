@@ -1,0 +1,52 @@
+# Python bytecode and cache directories
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments and local tooling
+.venv/
+venv/
+.env
+.env.*
+.python-version
+
+# Logs and runtime artifacts
+*.log
+*.pid
+*.seed
+instance/
+/tmp/
+
+# Packaging / build outputs
+build/
+dist/
+*.egg-info/
+
+docker-compose.override.yml
+docker-compose.yml
+docker-compose.local.yml
+
+# Editor and OS junk
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Kubernetes and Docker runtime leftovers
+*.kubeconfig
+*.tar
+
+# Local data/cache directories
+node_modules/
+.cache/
+.mypy_cache/
+.pytest_cache/
+coverage/
+htmlcov/
+
+# Secrets managed locally only
+k8s/secrets.yaml
+k8s/secrets.local.yaml
+
+# Discard temporary template copies
+templates/* copy.html

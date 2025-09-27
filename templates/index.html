@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}Home - MetaCleaner{% endblock %}
+
+{% block content %}
+<form method="POST" enctype="multipart/form-data" class="space-y-4">
+    {% if not filename %}
+        <!-- Upload step -->
+        <input id="fileInput" type="file" name="file"
+               accept="image/png, image/jpeg, image/jpg, image/gif"
+               class="border p-2 bg-gray-800 text-gray-200 rounded w-full"
+               required>
+
+        <button id="uploadBtn" type="submit" name="action" value="upload"
+                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled>
+            Upload & Preview
+        </button>
+    {% else %}
+        <!-- Clean step -->
+        <input type="hidden" name="filename" value="{{ filename }}">
+        <button type="submit" name="action" value="clean"
+                class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">
+            Clean & Show Differences
+        </button>
+    {% endif %}
+</form>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+    {% if before_meta %}
+    <div class="bg-gray-800 shadow-md rounded-lg p-4 overflow-auto">
+        <h2 class="text-xl font-semibold mb-2 text-red-400">📄 Original Metadata</h2>
+        <pre class="text-sm whitespace-pre-wrap text-gray-300">{{ before_meta|safe }}</pre>
+    </div>
+    {% endif %}
+
+    {% if after_meta %}
+    <div class="bg-gray-800 shadow-md rounded-lg p-4 overflow-auto">
+        <h2 class="text-xl font-semibold mb-2 text-green-400">✨ Cleaned Metadata</h2>
+        <pre class="text-sm whitespace-pre-wrap text-gray-300">{{ after_meta }}</pre>
+        <a href="{{ url_for('main.download_file', filename=cleaned_file) }}"
+           class="inline-block mt-2 bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded">
+           ⬇️ Download Cleaned File
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+  const fileInput = document.getElementById("fileInput");
+  const uploadBtn = document.getElementById("uploadBtn");
+
+  if (fileInput && uploadBtn) {
+    fileInput.addEventListener("change", function () {
+      uploadBtn.disabled = !fileInput.files.length;
+    });
+  }
+</script>
+{% endblock %}

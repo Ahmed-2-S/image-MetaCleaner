@@ -1,0 +1,43 @@
+# k8s/cleaner.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: metacleaner-cleaner               # Deployment name
+  namespace: metacleaner                  # Namespace
+spec:
+  replicas: 2                             # Scale cleaner independently
+  selector:
+    matchLabels:
+      app: metacleaner-cleaner            # Label selector for pods
+  template:
+    metadata:
+      labels:
+        app: metacleaner-cleaner          # Pod label
+    spec:
+      containers:
+      - name: metacleaner-cleaner         # Container name
+        image: ahmeds25/metacleaner-cleaner:latest   # Image pushed to Docker Hub
+        ports:
+        - containerPort: 5001             # Cleaner listens on port 5001
+        volumeMounts:                     # Mount the secret into the container
+        - name: secret-volume             # Volume name
+          mountPath: "/etc/secrets"       # Where secrets will be available
+          readOnly: true                  # Ensure no write access
+      volumes:                            # Declare the volume
+      - name: secret-volume               # Volume definition
+        secret:                           # Use Kubernetes Secret
+          secretName: metacleaner-secrets # Same secret as app
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: metacleaner-cleaner               # Service name
+  namespace: metacleaner                  # Namespace
+spec:
+  ports:
+  - port: 5001                            # Port inside cluster
+    targetPort: 5001                      # Forward to container port
+  selector:
+    app: metacleaner-cleaner              # Match pods with this label
+

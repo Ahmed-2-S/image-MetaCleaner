@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: metacleaner-db                     # DB deployment name
+  namespace: metacleaner                   # Namespace
+spec:
+  replicas: 1                              # DB doesn’t need scaling
+  selector:
+    matchLabels:
+      app: metacleaner-db                  # Match DB pods
+  template:
+    metadata:
+      labels:
+        app: metacleaner-db                # Pod label
+    spec:
+      containers:
+      - name: metacleaner-db               # DB container
+        image: mysql:8.0                   # Official MySQL image
+        ports:
+        - containerPort: 3306              # MySQL default port
+        env:                               # Environment variables for MySQL
+        - name: MYSQL_ROOT_PASSWORD        # Root password from secret
+          valueFrom:
+            secretKeyRef:
+              name: metacleaner-secrets
+              key: DB_PASSWORD
+        - name: MYSQL_DATABASE             # Database name from secret
+          valueFrom:
+            secretKeyRef:
+              name: metacleaner-secrets
+              key: DB_NAME
+        - name: MYSQL_USER                 # App DB user from secret
+          valueFrom:
+            secretKeyRef:
+              name: metacleaner-secrets
+              key: DB_USER
+        - name: MYSQL_PASSWORD             # App DB user password
+          valueFrom:
+            secretKeyRef:
+              name: metacleaner-secrets
+              key: DB_PASSWORD
+        volumeMounts:
+        - name: db-data                    # Mount persistent volume
+          mountPath: /var/lib/mysql
+        - name: db-init-script             # Mount init SQL so MySQL bootstraps schema
+          mountPath: /docker-entrypoint-initdb.d
+          readOnly: true
+      volumes:
+      - name: db-data                      # Persistent storage volume
+        persistentVolumeClaim:
+          claimName: db-pvc
+      - name: db-init-script               # ConfigMap with initialization SQL
+        configMap:
+          name: db-init-script
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: metacleaner-db                     # DB service name
+  namespace: metacleaner
+spec:
+  ports:
+  - port: 3306                             # Expose MySQL internally on 3306
+    targetPort: 3306
+  selector:
+    app: metacleaner-db                    # Match pods with this label

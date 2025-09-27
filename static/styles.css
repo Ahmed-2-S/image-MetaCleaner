@@ -1,0 +1,57 @@
+body {
+    background-color: #1e1e2f;
+    color: #e0e0e0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.card {
+    background-color: #2a2a3d;
+    border: 1px solid #444;
+    box-shadow: 0px 4px 12px rgba(0,0,0,0.5);
+}
+
+h2 {
+    color: #ff6b6b;
+}
+
+h2.text-success {
+    color: #4ade80; /* Soft green */
+}
+
+.btn-primary {
+    background-color: #3b82f6;
+    border: none;
+}
+.btn-primary:hover {
+    background-color: #2563eb;
+}
+
+/* Highlight removed entries in red */
+.removed {
+  background-color: #7f1d1d; /* dark red */
+  color: #fca5a5;            /* light red text */
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+
+/* Highlight new/kept entries in green */
+.kept {
+  background-color: #065f46; /* dark green */
+  color: #6ee7b7;            /* light green text */
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+
+.flashes {
+  list-style-type: none;
+  padding: 0;
+}
+.flashes li {
+  padding: 10px;
+  margin: 5px 0;
+  border-radius: 4px;
+}
+.success { background: #d4edda; color: #155724; }
+.error { background: #f8d7da; color: #721c24; }
+.info { background: #cce5ff; color: #004085; }
+.warning { background: #0b1219; color: yellow;}
