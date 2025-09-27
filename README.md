@@ -45,10 +45,11 @@ The system is built using **Flask**, **MySQL**, and **ExifTool**, and deployed u
 ### Diagram
 ```mermaid
 flowchart TD
-[ Browser ] --> [ App/UI Service ]
-[ App/UI Service ] --> [ Auth Service ]
-[ Auth Service ] --> [ DB Service (MySQL) ]
-[ App/UI Service ] --> [ Cleaner Service ]  (runs exiftool)
+    Browser[Browser] --> App[App/UI Service]
+    App --> Auth[Auth Service]
+    Auth --> DB[DB Service (MySQL)]
+    App --> Cleaner[Cleaner Service<br/>(runs exiftool)]
+
  ```
 
 ## 🛠️ Setup
