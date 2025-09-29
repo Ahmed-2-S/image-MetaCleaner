@@ -160,20 +160,20 @@ cd image-MetaCleaner
 ### 3. Setting up Kubernetes
 1. After replacing the placeholders **REPLACE_\***, you can now start **Docker Desktop** and go to the **Kubernetes** tab. The configuration option shown in the image below, is what has been used to test and deploy the app. Click on `Create`.
 
-    ![create_kubernetes_cluster](/image-MetaCleaner/images/creating_kubernetes_cluster.png)
+    ![create_kubernetes_cluster](/images/creating_kubernetes_cluster.png)
 
 2. You can click on `install` and wait for the cluster to be created.
 
-    ![installing_cluster](/image-MetaCleaner/images/cluster_installation.png)
+    ![installing_cluster](/images/cluster_installation.png)
 
 ### 4. Deploying the app in the Kubernetes Cluster
 1. Run the `make deploy` command to deploy the application in the cluster.
 
-    ![run_make_deploy](/image-MetaCleaner/images/running_make_deploy.png)
+    ![run_make_deploy](/images/running_make_deploy.png)
 
 2. Before accessing the web page of the application, make sure the database service has been correctly initialized by running `make logs-db`. In the terminal look for similar output:
 
-    ![checking_database_readiness](/image-MetaCleaner/images/checking_database_readiness.png)
+    ![checking_database_readiness](/images/checking_database_readiness.png)
 
 3. When you can spot the highlighted text above in the terminal, then you can now access the web page of the application on [http://localhost:30000](http://localhost:30000).
 
