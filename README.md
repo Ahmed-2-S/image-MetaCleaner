@@ -1,8 +1,12 @@
-# 📘 Image MetaCleaner - Documentation
+# Image MetaCleaner - Documentation
+
+## Table of Contents
+[Description of the Software](#description-of-the-software)
+
 ## Description of the Software
 MetaCleaner is a microservices-based web application that allows users to upload images, preview their metadata, clean/remove metadata (e.g., GPS location, camera info), and download the cleaned file.
 
-The system is built using **Flask**, **MySQL**, and **ExifTool**, and deployed using Kubernetes.
+> The application is built using **Flask**, **MySQL**, **Python** and **ExifTool**, and deployed using Kubernetes.
 
 ---
 
@@ -17,7 +21,7 @@ The system is built using **Flask**, **MySQL**, and **ExifTool**, and deployed u
 - Configurable and scalabe via Kubernetes.
 
 ---
-## 🏗️ Software Architecture Design
+## Software Architecture Design
 ### Components & Responsabilities
 - Auth microservice
     - Handles signup/login/logout.
@@ -43,6 +47,8 @@ The system is built using **Flask**, **MySQL**, and **ExifTool**, and deployed u
 - Auth **<->** DB via SQL queries.
 
 ### Diagram
+> The diagram below, shows the dataflow between the different services of **MetaCleaner**.
+
 ```mermaid
 flowchart TD
     Browser(Browser) e1@==>|1. Login request| Auth(Auth Service)
@@ -55,9 +61,10 @@ flowchart TD
     
     classDef animate stroke-dasharray: 9,5,stroke-dashoffset: 900,animation: dash 25s linear infinite;
     class e1 animate; class e2 animate; class e3 animate; class e4 animate; class e5 animate; class e6 animate; class e7 animate
-
  ```
-## 📂 Repository Structure
+ 
+## Repository Structure
+> This section provides an overview of the folder structure for **MetaCleaner**.
 
 ```
 image-MetaCleaner/
@@ -111,29 +118,66 @@ image-MetaCleaner/
     └── secrets.template.yaml      # Placeholder secret template
 ```
 
+## Setup
+> To simplify common development tasks, I provided a **Makefile**. Instead of running long `kubectl` commands, you can use the shortcuts provided in [Makefile Overview](#makefile-overview) section.
 
+### Makefile Overview
+> Overview of the commands available in the **Makefile** and their description.
 
-## 🛠️ Setup
+| Command         | Description |
+|:----------------|:-----------|
+| `make apply`           | Apply all manifests in the *yaml* files including the **PVC** |
+| `make check-secrets-file` | Ensure the secrets manifest **secrets.local.yaml** exists before applying resources |
+| `make deploy`          | Creates the namespace and apply all the manifests |
+| `make down`            | Tears down the workload but keep the **PVC** for data persistence |
+| `make logs-app`        | Shows the logs from the **App service** |
+| `make logs-cleaner`    | Shows the logs for the **Cleaner service** |
+| `make logs-db`         | Shows the logs for the **Database service** |
+| `make namespace`       | Creates the namespace `metacleaner` |
+| `make purge`           | Fully removes cluster resources including the **PVC** |
+| `make status`          | Display the status of the cluster |
 
-### Clone
+### 1. Clone the GitHub repository
+
 ```bash
 git clone https://github.com/Ahmed-2-S/image-MetaCleaner.git
-
 cd image-MetaCleaner
 ```
 
-### Configure Kubernetes Secrets
-1. Copy the template to a local file and fill in real values (the copy stays untracked by Git):
+### 2. Configure Kubernetes Secrets
+1. Copy the template `secrets.template.yaml` to a local file, called `secrets.local.yaml` (the copy stays untracked by Git). Fill in real values by replace each **REPLACE_\*** placeholder with your actual database credentials, API key, and a strong Flask **SECRET_KEY**:
 
-   ```bash
-   cp k8s/secrets.template.yaml k8s/secrets.local.yaml
-   
-   nano k8s/secrets.local.yaml    # or open with your preferred editor
-   ```
+    ```bash
+    cp k8s/secrets.template.yaml k8s/secrets.local.yaml
+    ```
 
-   Replace each **REPLACE_\*** placeholder with your actual database credentials, API key, and a strong Flask **SECRET_KEY**.
+    ``` bash
+    nano k8s/secrets.local.yaml
+    ```
 
-2. Apply the secret before deploying workloads:
+> Here is `nano` used as text editor, you can open the file using your preferred text editor.
+
+### 3. Setting up Kubernetes
+1. After replacing the placeholders **REPLACE_\***, you can now start **Docker Desktop** and go to the **Kubernetes** tab. The configuration option shown in the image below, is what has been used to test and deploy the app. Click on `Create`.
+
+    ![create_kubernetes_cluster](/image-MetaCleaner/images/creating_kubernetes_cluster.png)
+
+2. You can click on `install` and wait for the cluster to be created.
+
+    ![installing_cluster](/image-MetaCleaner/images/cluster_installation.png)
+
+### 4. Deploying the app in the Kubernetes Cluster
+1. Run the `make deploy` command to deploy the application in the cluster.
+
+    ![run_make_deploy](/image-MetaCleaner/images/running_make_deploy.png)
+
+2. Before accessing the web page of the application, make sure the database service has been correctly initialized by running `make logs-db`. In the terminal look for similar output:
+
+    ![checking_database_readiness](/image-MetaCleaner/images/checking_database_readiness.png)
+
+3. When you can spot the highlighted text above in the terminal, then you can now access the web page of the application on [http://localhost:30000](http://localhost:30000).
+
+<!-- 2. Apply the secret before deploying workloads:
 
    ```bash
    kubectl apply -f k8s/secrets.local.yaml
@@ -152,13 +196,12 @@ cd image-MetaCleaner
     --from-literal=CLEANER_API_KEY=REPLACE_CLEANER_API_KEY \
     --from-literal=SECRET_KEY=REPLACE_FLASK_SECRET_KEY \
     --dry-run=client -o yaml | kubectl apply -f -
-    ```
+    ``` -->
 
 ### Optional: Local Docker Compose
 1. Copy the template to keep secrets local:
    ```bash
    cp docker-compose.template.yml docker-compose.yml
-
    nano docker-compose.yml  # fill in REPLACE_* values
    ```
 
@@ -168,38 +211,37 @@ cd image-MetaCleaner
 
 4. **IMPORTANT** - Rename the dockerfile inside the database folder (`/database/Dockerfile`) to e.g., (`/database/Dockerfile.original`) and create a new file with the name `Dockerfile`. In this new file paste in the following docker commands:
 
-```docker
-FROM mysql:8.0.43-bookworm
+    ```docker
+    FROM mysql:8.0.43-bookworm
 
-# Set default DB
-ENV MYSQL_DATABASE=dbMetaCleaner
+    # Set default DB
+    ENV MYSQL_DATABASE=dbMetaCleaner
 
-# Copy init script
-COPY ./scripts/ /docker-entrypoint-initdb.d/
-```
+    # Copy init script
+    COPY ./scripts/ /docker-entrypoint-initdb.d/
+    ```
 
 5. The generated `docker-compose.yml` is ignored by Git, so credentials never leave your machine.
 
 6. Now you can run the application using the following command:
 
-```bash
-# The -f [FILENAME] is to be more specific about which compose file to use
+    ```bash
+    # The -f [FILENAME] is to be more specific about which compose file to use
+    docker compose -f docker-compose.yml up
+    ```
 
-docker compose -f docker-compose.yml up
-```
+    or just run the following if you have only one compose file in your working directory:
 
-or just run the following if you have only one compose file in your working directory:
+    ```bash
+    docker compose up
+    ```
 
-```bash
-docker compose up
-```
+7. Now just wait for docker to wire everything up and look for those two lines in the terminal, in the following order:
 
-7. Now just wait for docker to wire everthing up and look for those two lines in the terminal, in the following order:
+    ```bash
+    db-metacleaner | [DATE_AND_TIME] 0 [System] [MY-011323] [Server] X Plugin ready for connections. Bind-address: '::' port: 33060 ...
 
-```bash
-db-metacleaner | [DATE_AND_TIME] 0 [System] [MY-011323] [Server] X Plugin ready for connections. Bind-address: '::' port: 33060 ...
+    db-metacleaner | [DATE_AND_TIME] 0 [System] [MY-010931] [Server] /usr/sbin/mysqld: ready for connections. Version: '8.0.43' ...
+    ```
 
-db-metacleaner | [DATE_AND_TIME] 0 [System] [MY-010931] [Server] /usr/sbin/mysqld: ready for connections. Version: '8.0.43' ...
-```
-
-This means that the database server is ready and you can use the application correctly. Prior to seeing those two lines, the web application would not work, since it depends on the correct startup of the database.
+    This means that the database server is ready and you can use the application correctly. Prior to seeing those two lines, the web application would not work, since it depends on the correct startup of the database.

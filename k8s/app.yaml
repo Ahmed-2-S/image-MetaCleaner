@@ -85,7 +85,7 @@ spec:
           value: http://metacleaner-cleaner:5001   # Cleaner service inside cluster
         - name: FLASK_ENV
           value: production
-        volumeMounts:                           # Mount the secret as files, optional
+        volumeMounts:                           # Mount the secret as files
         - name: secret-volume
           mountPath: "/etc/secrets"
           readOnly: true
