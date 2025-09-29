@@ -84,6 +84,7 @@ flowchart TD
 ### Communication
 - App **<->** Cleaner via REST API.
 - App **<->** Auth via internal Flask/DB calls.
+- App **->** DB via SQL queries.
 - Auth **<->** DB via SQL queries.
 
 ### Dataflow Diagram
