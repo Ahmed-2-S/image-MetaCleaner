@@ -11,7 +11,7 @@
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Communincation](#communication)
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Diagram](#diagram)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Dataflow Diagram](#dataflow-diagram)
 
 [Folder Structure](#folder-structure)
 
@@ -68,26 +68,41 @@ MetaCleaner is a microservices-based web application that allows users to upload
     - Stores user accounts and file history.
     - Runs as stateful service with persistent volume claim (PVC).
 
+> System level architecture of the MetaCleaner application.
+
+```mermaid
+flowchart TD
+    Browser(Browser<br/>- User Interface -) -->|HTTP/HTTPS| Auth(Auth Service<br/>- Flask + Login -)
+    Auth -->|Validates User| App(App Service<br/>- Flask UI -)
+    Auth -->|SQL Queries| DB[(Database Service<br/>- MySQL -)]
+    DB -->|SQL Responses| Auth
+    App -->|REST API Calls| Cleaner(Cleaner Service<br/>- ExifTool Wrapper -)
+    Cleaner -->|Cleaned File + Metadata| App
+    App --> |Filename + size| DB
+```
+
 ### Communication
 - App **<->** Cleaner via REST API.
 - App **<->** Auth via internal Flask/DB calls.
 - Auth **<->** DB via SQL queries.
 
-### Diagram
+### Dataflow Diagram
 > The diagram below, shows the dataflow between the different services of **MetaCleaner**.
 
 ```mermaid
 flowchart TD
-    Browser(Browser) e1@==>|1. Login request| Auth(Auth Service)
-    Auth e2@==>|2. Verify user via SQL queries| DB[(DB Service<br/> - MySQL -)]
+    Browser(Browser<br/>- User interface -) e1@==>|1. Login request| Auth(Auth Service<br/>- Flask + Login -)
+    App e8@==> |8. Filename and size | DB
+    Auth e2@==>|2. Verify user via SQL queries| DB[(Database Service<br/> - MySQL -)]
     DB e3@==>|3. SQL responses - user record| Auth
     Auth e4@==>|4. Session cookie / JWT| Browser
-    Browser e5@==>|5. Authenticated requests - with session| App(App/UI Service)
-    App e6@==>|6. REST API calls| Cleaner(Cleaner Service<br/> - runs exiftool -)
+    Browser e5@==>|5. Authenticated requests - with session| App(App Service<br/>- Flask UI -)
+    App e6@==>|6. REST API calls| Cleaner(Cleaner Service<br/> - ExifTool Wrapper -)
     Cleaner e7@==>|7. REST API responses| App
     
     classDef animate stroke-dasharray: 9,5,stroke-dashoffset: 900,animation: dash 25s linear infinite;
-    class e1 animate; class e2 animate; class e3 animate; class e4 animate; class e5 animate; class e6 animate; class e7 animate
+    class e1 animate; class e2 animate; class e3 animate; class e4 animate; class e5 animate;
+    class e6 animate; class e7 animate; class e8 animate
  ```
  
 ## Folder Structure
