@@ -3,6 +3,33 @@
 ## Table of Contents
 [Description of the Software](#description-of-the-software)
 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Main Features](#main-features)
+
+[Software Architecture Design](#software-architecture-design)
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Components & Responsabilities](#components--responsabilities)
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Communincation](#communication)
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Diagram](#diagram)
+
+[Folder Structure](#folder-structure)
+
+[Makefile Overview](#makefile-overview)
+
+[Setup](#setup)
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[1. Clone the GitHub repository](#1-clone-the-github-repository)
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[2. Configure Kubernetes Secrets](#2-configure-kubernetes-secrets)
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[3. Setting up Kubernetes](#3-setting-up-kubernetes)
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[4. Deploying the app in the Kubernetes Cluster](#4-deploying-the-app-in-the-kubernetes-cluster)
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Optional: Local Docker Compose](#optional-local-docker-compose)
+
+
 ## Description of the Software
 MetaCleaner is a microservices-based web application that allows users to upload images, preview their metadata, clean/remove metadata (e.g., GPS location, camera info), and download the cleaned file.
 
@@ -63,7 +90,7 @@ flowchart TD
     class e1 animate; class e2 animate; class e3 animate; class e4 animate; class e5 animate; class e6 animate; class e7 animate
  ```
  
-## Repository Structure
+## Folder Structure
 > This section provides an overview of the folder structure for **MetaCleaner**.
 
 ```
@@ -118,10 +145,7 @@ image-MetaCleaner/
     └── secrets.template.yaml      # Placeholder secret template
 ```
 
-## Setup
-> To simplify common development tasks, I provided a **Makefile**. Instead of running long `kubectl` commands, you can use the shortcuts provided in [Makefile Overview](#makefile-overview) section.
-
-### Makefile Overview
+## Makefile Overview
 > Overview of the commands available in the **Makefile** and their description.
 
 | Command         | Description |
@@ -136,6 +160,9 @@ image-MetaCleaner/
 | `make namespace`       | Creates the namespace `metacleaner` |
 | `make purge`           | Fully removes cluster resources including the **PVC** |
 | `make status`          | Display the status of the cluster |
+
+## Setup
+> To simplify common development tasks, I provided a **Makefile**. Instead of running long `kubectl` commands, you can use the shortcuts provided in [Makefile Overview](#makefile-overview) section.
 
 ### 1. Clone the GitHub repository
 
