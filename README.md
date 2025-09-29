@@ -288,3 +288,5 @@ cd image-MetaCleaner
     ```
 
     This means that the database server is ready and you can use the application correctly. Prior to seeing those two lines, the web application would not work, since it depends on the correct startup of the database.
+    
+8. Now you can access the application through [http://127.0.0.1:5000](http://127.0.0.1:5000) (as it was displayed in the terminal before the startup of the database).
